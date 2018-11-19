@@ -31,15 +31,30 @@
       (info node "installing Cassandra from" url)
       (if (cached-install? url)
         (info "Used cached install on node" node)
-        (do (if tpath ;;else (not found locally, download it)
+        (do (if tpath ;; else: if not found locally, download it
               (c/upload tpath "/tmp/cassandra.tar.gz")
               (c/exec :wget :-O "cassandra.tar.gz" url (lit ";")))
             (c/exec :tar :xzvf "cassandra.tar.gz" :-C "~")
             (c/exec :rm :-r :-f (lit "~/cassandra"))
             (c/exec :mv (lit "~/apache* ~/cassandra"))
             (c/exec :echo url :> (lit ".download")))))
-)))
-
+(c/exec
+     :echo
+     "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main"
+     :>"/etc/apt/sources.list.d/webupd8team-java.list")
+    (c/exec
+     :echo
+     "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main"
+     :>> "/etc/apt/sources.list.d/webupd8team-java.list")
+    (try (c/exec :apt-key :adv :--keyserver "hkp://keyserver.ubuntu.com:80"
+                :--recv-keys "EEA14886")
+         (debian/update!)
+         (catch RuntimeException e
+           (info "Error updating caused by" e)))
+    (c/exec :echo
+            "debconf shared/accepted-oracle-license-v1-1 select true"
+            | :debconf-set-selections)
+    (debian/install [:oracle-java8-installer]))))
 
 
 (defn db
