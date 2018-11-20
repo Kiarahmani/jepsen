@@ -195,6 +195,8 @@
    (meh (c/exec :rm :-r "~/cassandra/data/commitlog"))
    (meh (c/exec :rm :-r "~/cassandra/data/saved_caches"))))
 
+(def dir     "~/cassandra/logs")
+(def logfile (str dir "/system.log"))
 
 ;;====================================================================================
 (defn db
@@ -211,10 +213,10 @@
 
     (teardown! [_ test node]
       (info node "tearing down cassandra")
-      (wipe! node))))
-
-
-
+      (wipe! node))
+     db/LogFiles
+      (log-files [_ test node]
+         [logfile])))
 
 ;;====================================================================================
 (defn cassandra-test
