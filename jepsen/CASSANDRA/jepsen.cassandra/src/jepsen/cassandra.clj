@@ -5,7 +5,8 @@
 		    [control :as c :refer [| lit]]
                     [db :as db]
                     [tests :as tests]
-		    [generator :as gen]]
+		    [generator :as gen]
+		    [util      :as util :refer [meh timeout]]]
             ;[jepsen.control.util :as net/util]
             [jepsen.control.net :as net]
 	    [jepsen.os.debian :as debian])
@@ -163,6 +164,38 @@
 ;TODO : understand why the above command is necessary and why it fails
 ))
 
+
+;;====================================================================================
+(defn start!
+  "Starting Cassandra..."
+  [node test]
+  (info node "starting Cassandra")
+  (c/su
+   (c/exec (lit "~/cassandra/bin/cassandra -R"))))
+
+(defn stop!
+  "Stopping Cassandra..."
+  [node]
+  (info node "stopping Cassandra")
+  (c/su
+   (meh (c/exec :killall :java))
+   (while (.contains (c/exec :ps :-ef) "java")
+     (Thread/sleep 100)))
+  (info node "has stopped Cassandra"))
+
+(defn wipe!
+  "Shuts down Cassandra and wipes data."
+  [node]
+  (stop! node)
+  (info node "deleting data files")
+  (c/su
+   (meh (c/exec :rm :-r "~/cassandra/logs"))
+   (meh (c/exec :rm :-r "~/cassandra/data/data"))
+   (meh (c/exec :rm :-r "~/cassandra/data/hints"))
+   (meh (c/exec :rm :-r "~/cassandra/data/commitlog"))
+   (meh (c/exec :rm :-r "~/cassandra/data/saved_caches"))))
+
+
 ;;====================================================================================
 (defn db
   "Cassandra for a particular version."
@@ -173,10 +206,12 @@
       (doto node      
 	(install! version)
 	(initJava! version)
-	(configure! test)))
+	(configure! test)
+	(start! test)))
 
     (teardown! [_ test node]
-      (info node "tearing down cassandra"))))
+      (info node "tearing down cassandra")
+      (wipe! node))))
 
 
 
