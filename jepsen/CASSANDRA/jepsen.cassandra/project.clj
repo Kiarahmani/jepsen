@@ -4,4 +4,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :main jepsen.cassandra
   :dependencies [[org.clojure/clojure "1.9.0"]
-                 [jepsen "0.1.8"]])
+                 [jepsen "0.1.8"]
+		 [environ "1.1.0"]])

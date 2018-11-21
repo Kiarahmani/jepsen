@@ -1,5 +1,6 @@
 (ns jepsen.cassandra
-(:require [clojure.tools.logging :refer :all]
+(:require   
+	    [clojure.tools.logging :refer :all]
             [clojure.string :as str]
             [jepsen [cli :as cli]
 		    [control :as c :refer [| lit]]
@@ -47,9 +48,11 @@
 
 
 ;;====================================================================================
-(defn doInitJava!
+(defn initJava!
 	"Installs Java on the given node"
 	[node version]
+	(if true	
+	(do 
 	(info node "Installing Java...")
 	(c/su
    	(c/cd
@@ -68,14 +71,9 @@
             		"debconf shared/accepted-oracle-license-v1-1 select true"
             		| :debconf-set-selections)
     		(debian/install [:oracle-java8-installer]))))
+) 
+)
 
-(defn initJava!
-	"makes sure java exists and if not calls the installer"	
-	[node version]
-	(info "making sure Java exists")
-	(if (not (System/getProperty "java.vm.version"))
-		(doInitJava! node version)
-		(info "Java is already installed")))
 
 
 
