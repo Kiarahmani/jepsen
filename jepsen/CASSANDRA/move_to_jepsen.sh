@@ -12,6 +12,9 @@ for i in `seq 1 $1`;
 
 
 # drop previous keyspaces
-#docker exec -ti jepsen-n2 root/cassandra/bin/cqlsh $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jepsen-n2) -e " DROP KEYSPACE testks"
+docker exec -ti jepsen-n2 root/cassandra/bin/cqlsh $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jepsen-n2) -e " DROP KEYSPACE testks"
+
 # create a fresh keysapace
 docker exec -ti jepsen-n2 root/cassandra/bin/cqlsh $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jepsen-n2) -e "CREATE KEYSPACE if NOT EXISTS testks WITH replication = {'class': 'NetworkTopologyStrategy', $dc}"
+# create a fresh table
+docker exec -ti jepsen-n2 root/cassandra/bin/cqlsh $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' jepsen-n2) -e "create TABLE testks.a (id int PRIMARY KEY , balance int)"

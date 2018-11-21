@@ -5,7 +5,8 @@
             [jepsen [cli :as cli]
 		    [control :as c :refer [| lit]]
                     [db :as db]
-                    [tests :as tests]
+                    [client :as client]
+		    [tests :as tests]
 		    [generator :as gen]
 		    [util      :as util :refer [meh timeout]]]
             ;[jepsen.control.util :as net/util]
@@ -201,6 +202,23 @@
 (def dir     "~/cassandra/logs")
 (def logfile (str dir "/system.log"))
 
+
+
+
+;;====================================================================================
+(defrecord Client [conn]
+  client/Client
+  (open! [this test node]
+    this)
+
+  (setup! [this test])
+
+  (invoke! [_ test op])
+
+  (teardown! [this test])
+
+  (close! [_ test]))
+
 ;;====================================================================================
 (defn db
   "Cassandra for a particular version."
@@ -213,8 +231,8 @@
 	(install! version)
 	(initJava! version)
 	(configure! test)
-	(start! test)
-))
+	(start! test)))
+
 
     (teardown! [_ test node]
       (info node "tearing down cassandra")
