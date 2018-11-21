@@ -51,7 +51,7 @@
 (defn initJava!
 	"Installs Java on the given node"
 	[node version]
-	(if true	
+	(if true ;;TODO: automate java detection	
 	(do 
 	(info node "Installing Java...")
 	(c/su
@@ -152,6 +152,10 @@
                       (str "\"s/#   - class_name: LZ4Compressor/"
                       "    - class_name: LZ4Compressor/g\"")]))]
      		      (c/exec :sed :-i (lit rep) "~/cassandra/conf/cassandra.yaml"))
+     (doseq [rep (into [(str "\"s/dc=dc1/dc=dc_" node "/g\"")
+			(str "\"s/rack=rack1/rack=rack_" node "/g\"")])]
+     		      (c/exec :sed :-i (lit rep) "~/cassandra/conf/cassandra-rackdc.properties"))
+
      (c/exec :echo (str "JVM_OPTS=\"$JVM_OPTS -Dcassandra.mv_disable_coordinator_batchlog="
                       	(coordinator-batchlog-disabled?) "\"") 
      			:>> "~/cassandra/conf/cassandra-env.sh")
@@ -169,7 +173,8 @@
   [node test]
   (info node "starting Cassandra")
   (c/su
-   (c/exec (lit "~/cassandra/bin/cassandra -R"))))
+   (c/exec (lit "~/cassandra/bin/cassandra -R"))
+))
 
 (defn stop!
   "Stopping Cassandra..."
@@ -208,7 +213,8 @@
 	(install! version)
 	(initJava! version)
 	(configure! test)
-	(start! test)))
+	(start! test)
+))
 
     (teardown! [_ test node]
       (info node "tearing down cassandra")
