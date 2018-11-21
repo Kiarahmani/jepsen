@@ -50,7 +50,7 @@
 (defn doInitJava!
 	"Installs Java on the given node"
 	[node version]
-	(info "Installing Java on node: " node)
+	(info node "Installing Java...")
 	(c/su
    	(c/cd
 	(c/exec :echo
@@ -73,11 +73,9 @@
 	"makes sure java exists and if not calls the installer"	
 	[node version]
 	(info "making sure Java exists")
-	(c/exec :echo
-		"java -version")
-	;(doInitJava! node version)
-; TODO: must automatically check if it exists
-)
+	(if (not (System/getProperty "java.vm.version"))
+		(doInitJava! node version)
+		(info "Java is already installed")))
 
 
 
