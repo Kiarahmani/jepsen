@@ -134,6 +134,7 @@
      (c/exec :sed :-i (lit rep) "~/cassandra/conf/cassandra-env.sh"))
      (doseq [rep (into ["\"s/cluster_name: .*/cluster_name: 'jepsen'/g\""
                       "\"s/row_cache_size_in_mb: .*/row_cache_size_in_mb: 20/g\""
+		      "\"s/endpoint_snitch: .*/endpoint_snitch: GossipingPropertyFileSnitch/g\""
                       "\"s/seeds: .*/seeds: 'n1,n2'/g\""
                       (str "\"s/listen_address: .*/listen_address: " (dns-resolve node)
                            "/g\"")
@@ -162,6 +163,7 @@
 ;     (c/exec :echo (str "auto_bootstrap: " (-> test :bootstrap deref node boolean))
 ;           		:>> "~/cassandra/conf/cassandra.yaml")
 ;TODO : understand why the above command is necessary and why it fails
+(info node "configured CASSANDRA")
 ))
 
 
@@ -205,6 +207,7 @@
   (reify db/DB
     (setup! [_ test node]
       (info node "installing cassandra" version)
+      (wipe! node)
       (doto node      
 	(install! version)
 	(initJava! version)
@@ -213,10 +216,12 @@
 
     (teardown! [_ test node]
       (info node "tearing down cassandra")
-      (wipe! node))
+ ;     (wipe! node)
+    )
      db/LogFiles
       (log-files [_ test node]
-         [logfile])))
+         [logfile])
+))
 
 ;;====================================================================================
 (defn cassandra-test
