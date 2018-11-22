@@ -11,9 +11,11 @@
 		    [util      :as util :refer [meh timeout]]]
             ;[jepsen.control.util :as net/util]
             [jepsen.control.net :as net]
-	    [jepsen.os.debian :as debian])
+	    [jepsen.os.debian :as debian]
+)
 (:import (clojure.lang ExceptionInfo)
-           (java.net InetAddress))
+           (java.net InetAddress)
+	   (App))
 )
 
 
@@ -167,6 +169,28 @@
 (info node "configured CASSANDRA")
 ))
 
+;; CLIENT
+;;====================================================================================
+(defn r   [_ _] {:type :invoke, :f :readTxn, :value nil})
+(defn w   [_ _] {:type :invoke, :f :writeTxn, :value (rand-int 5)})
+
+
+(defrecord Client [conn]
+  client/Client
+  (open! [this test node]
+	(assoc this :conn (info "OPENNING A CONNECTION" node))
+	)    
+  (setup! [this test])
+  (invoke! [this test op]
+	(case (:f op)
+        :readTxn (assoc op :type :ok, :value 12)
+	:writeTxn (do (info conn)
+			
+			(App/testFunction )
+                            (assoc op :type, :ok))
+))
+  (teardown! [this test])
+  (close! [_ test]))
 
 ;;====================================================================================
 (defn start!
@@ -206,18 +230,6 @@
 
 
 ;;====================================================================================
-(defrecord Client [conn]
-  client/Client
-  (open! [this test node]
-    this)
-
-  (setup! [this test])
-
-  (invoke! [_ test op])
-
-  (teardown! [this test])
-
-  (close! [_ test]))
 
 ;;====================================================================================
 (defn db
@@ -231,7 +243,8 @@
 	(install! version)
 	(initJava! version)
 	(configure! test)
-	(start! test)))
+	;(start! test)
+))
 
 
     (teardown! [_ test node]
@@ -252,7 +265,12 @@
          opts
 	 {:name "cassandra"
           :os   debian/os
-          :db   (db "3.11.3")}))
+          :db   (db "3.11.3")
+	  :client (Client. nil)
+	  :generator (->> (gen/mix [r w])
+                          (gen/stagger 1)
+                          (gen/nemesis nil)
+                          (gen/time-limit 5))}))
 
 ;;====================================================================================
 (defn -main

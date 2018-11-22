@@ -5,4 +5,6 @@
   :main jepsen.cassandra
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [jepsen "0.1.8"]
-		 [environ "1.1.0"]])
+		 [environ "1.1.0"]]
+  :java-source-paths ["/root/java/"]
+)
