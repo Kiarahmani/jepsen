@@ -5,12 +5,13 @@
             [jepsen [cli :as cli]
 		    [control :as c :refer [| lit]]
                     [db :as db]
-                    [client :as client]
+		    [client :as client]
 		    [tests :as tests]
 		    [generator :as gen]
 		    [util      :as util :refer [meh timeout]]]
             ;[jepsen.control.util :as net/util]
-            [jepsen.control.net :as net]
+            [jepsen.control.util :as cu]
+	    [jepsen.control.net :as net]
 	    [jepsen.os.debian :as debian]
 )
 (:import (clojure.lang ExceptionInfo)
@@ -178,15 +179,14 @@
 (defrecord Client [conn]
   client/Client
   (open! [this test node]
-	(assoc this :conn (info "OPENNING A CONNECTION" node))
+	(assoc this :conn (App/getConnection (dns-resolve node)))
 	)    
   (setup! [this test])
   (invoke! [this test op]
 	(case (:f op)
         :readTxn (assoc op :type :ok, :value 12)
-	:writeTxn (do (info conn)
-			
-			(App/testFunction )
+	:writeTxn (do (info "CONNECTION: " conn)
+			(App/testFunction)
                             (assoc op :type, :ok))
 ))
   (teardown! [this test])
@@ -238,7 +238,7 @@
   (reify db/DB
     (setup! [_ test node]
       (info node "installing cassandra" version)
-      (wipe! node)
+      ;(wipe! node)
       (doto node      
 	(install! version)
 	(initJava! version)

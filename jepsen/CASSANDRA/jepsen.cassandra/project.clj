@@ -5,6 +5,9 @@
   :main jepsen.cassandra
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [jepsen "0.1.8"]
-		 [environ "1.1.0"]]
+		 [environ "1.1.0"]
+		 [verschlimmbesserung "0.1.3"]
+]
   :java-source-paths ["/root/java/"]
+  :resource-paths ["resources/cassandra-jdbc-wrapper-3.1.0-SNAPSHOT.jar"]
 )
