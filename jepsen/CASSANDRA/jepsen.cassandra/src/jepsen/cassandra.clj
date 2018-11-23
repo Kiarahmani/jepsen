@@ -184,9 +184,8 @@
   (setup! [this test])
   (invoke! [this test op]
 	(case (:f op)
-        :readTxn (assoc op :type :ok, :value 12)
-	:writeTxn (do (info "CONNECTION: " conn)
-			(App/testFunction)
+        :readTxn (assoc op :type :ok, :value (App/readTxn conn))
+	:writeTxn (do (App/writeTxn conn)
                             (assoc op :type, :ok))
 ))
   (teardown! [this test])
