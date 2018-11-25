@@ -5,6 +5,7 @@
             [jepsen [cli :as cli]
 		    [control :as c :refer [| lit]]
                     [db :as db]
+		    [checker :as checker]
 		    [client :as client]
 		    [tests :as tests]
 		    [generator :as gen]
@@ -12,7 +13,11 @@
             ;[jepsen.control.util :as net/util]
             [jepsen.control.util :as cu]
 	    [jepsen.control.net :as net]
+	    [jepsen.checker.timeline :as timeline]
 	    [jepsen.os.debian :as debian]
+	    [slingshot.slingshot :refer [try+]]
+	    [knossos.model :as model]
+	    [knossos.op :as op]
 )
 (:import (clojure.lang ExceptionInfo)
            (java.net InetAddress)
@@ -172,8 +177,8 @@
 
 ;; CLIENT
 ;;====================================================================================
-(defn r   [_ _] {:type :invoke, :f :readTxn, :value nil})
-(defn w   [_ _] {:type :invoke, :f :writeTxn, :value (rand-int 5)})
+(defn r   [_ _] {:type :invoke, :f :read, :value nil})
+(defn w   [_ _] {:type :invoke, :f :write, :value (rand-int 500)})
 
 
 (defrecord Client [conn]
@@ -184,12 +189,33 @@
   (setup! [this test])
   (invoke! [this test op]
 	(case (:f op)
-        :readTxn (assoc op :type :ok, :value (App/readTxn conn))
-	:writeTxn (do (App/writeTxn conn)
+        :read (assoc op :type :ok, :value (App/readTxn conn))
+	:write (do (App/writeTxn conn (:value op))
                             (assoc op :type, :ok))
 ))
-  (teardown! [this test])
+  (teardown! [this test]
+	(do (App/closeConnection conn)))
   (close! [_ test]))
+
+
+;; MODEL
+;;====================================================================================
+(defn myChecker
+  "Ensures that no read returns 500"
+  []
+  (reify checker/Checker
+    (check [this test model history opts]
+      (let [badReads       (->> history
+                             (filter op/ok?)
+                             (filter #(= :read (:f %)))
+			     (filter #(= 500 (:value %))))
+            writes     (->> history
+                             (filter op/ok?)
+                             (filter #(= :write (:f %))))]
+        {:valid?     (empty? badReads)
+         :ok-writes  writes}))))
+
+
 
 ;;====================================================================================
 (defn start!
@@ -226,10 +252,6 @@
 (def logfile (str dir "/system.log"))
 
 
-
-
-;;====================================================================================
-
 ;;====================================================================================
 (defn db
   "Cassandra for a particular version."
@@ -248,7 +270,7 @@
 
     (teardown! [_ test node]
       (info node "tearing down cassandra")
- ;     (wipe! node)
+      ;(wipe! node)
     )
      db/LogFiles
       (log-files [_ test node]
@@ -265,6 +287,11 @@
 	 {:name "cassandra"
           :os   debian/os
           :db   (db "3.11.3")
+	  :checker (checker/compose
+                    {:perf   (checker/perf)
+                     :linear (myChecker)
+		     :timeline  (timeline/html)})
+	  :model      (model/register)
 	  :client (Client. nil)
 	  :generator (->> (gen/mix [r w])
                           (gen/stagger 1)
