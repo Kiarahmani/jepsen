@@ -8,6 +8,7 @@
 		    [checker :as checker]
 		    [client :as client]
 		    [tests :as tests]
+		    [nemesis :as nemesis]
 		    [generator :as gen]
 		    [util      :as util :refer [meh timeout]]]
             ;[jepsen.control.util :as net/util]
@@ -294,9 +295,9 @@
 	  :model      (model/register)
 	  :client (Client. nil)
 	  :generator (->> (gen/mix [r w])
-                          (gen/stagger 1)
+                          (gen/stagger 1/100)
                           (gen/nemesis nil)
-                          (gen/time-limit 5))}))
+                          (gen/time-limit (:time-limit opts)))}))
 
 ;;====================================================================================
 (defn -main
