@@ -61,7 +61,7 @@
 (defn initJava!
 	"Installs Java on the given node"
 	[node version]
-	(if false ;;TODO: automate java detection	
+	(if true ;;TODO: automate java detection	
 	(do 
 	(info node "Installing Java...")
 	(c/su
