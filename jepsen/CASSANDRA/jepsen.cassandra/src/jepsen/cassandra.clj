@@ -35,12 +35,12 @@
   (reify db/DB
     (setup! [_ test node]
       (info node "installing cassandra" version)
-      ;(wipe! node)
+      (wipe! node)
       (doto node      
 	(install! version)
 	(initJava! version)
 	(configure! test)
-	;(start! test)
+	(start! test)
 ))
     (teardown! [_ test node]
       (info node "tearing down cassandra")
