@@ -21,7 +21,7 @@
 )
 (:import (clojure.lang ExceptionInfo)
            (java.net InetAddress)
-	   (App))
+	   (SeatsClient))
 )
 
 (load "cassandra-db")
@@ -35,7 +35,7 @@
   (reify db/DB
     (setup! [_ test node]
       (info node "installing cassandra" version)
-      (wipe! node)
+      ;(wipe! node)
       (doto node      
 	(install! version)
 	(initJava! version)
@@ -67,7 +67,7 @@
 	  :model      (my-register)
 	  :client (Client. nil)
 	  :generator (->> (gen/mix [r w])
-                          (gen/stagger 1)
+                          (gen/stagger 1/100)
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
 
