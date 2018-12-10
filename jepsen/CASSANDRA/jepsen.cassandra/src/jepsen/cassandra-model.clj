@@ -34,17 +34,19 @@
 	opKey  (:mkey op)
 	modelVal (nth kvMap (int opKey))]        
 	 (condp = (:f op)
-          :writeTxn(MyRegister. (assoc kvMap opKey (* 2 opVal)))
+          :writeTxn(MyRegister. (assoc kvMap opKey (opVal)))
           :readTxn (if (or (= modelVal opVal)
 			   (= -20 opVal)
 			   (nil? opVal))
 				(MyRegister. kvMap)
-				(inconsistent (str "read value: " opVal " ---> expected: " modelVal))))))
+				(MyRegister. kvMap)
+;				(inconsistent (str "read value: " opVal " ---> expected: " modelVal))
+))))
   Object
   (toString [this] (pr-str kvMap)))
 
 (defn my-register []
-  (MyRegister. [0,0,0,0,0,0]))
+  (MyRegister. (vec (repeat consts/_NUM_ASSERTIONS 1000))))
 
 ;; CHECKERS
 ;;====================================================================================

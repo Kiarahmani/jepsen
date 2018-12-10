@@ -18,6 +18,7 @@
 	    [slingshot.slingshot :refer [try+]]
 	    [knossos.model :as model]
 	    [knossos.op :as op]
+            [jepsen.constants :as consts]
 )
 (:import (clojure.lang ExceptionInfo)
            (java.net InetAddress)
@@ -27,6 +28,7 @@
 (load "cassandra-db")
 (load "cassandra-model")
 (load "cassandra-client")
+
 
 ;;====================================================================================
 (defn db
