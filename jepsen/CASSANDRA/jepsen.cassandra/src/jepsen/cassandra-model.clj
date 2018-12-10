@@ -24,22 +24,22 @@
 
 ;; DATA STRUCTURES
 ;;====================================================================================
-(defrecord MyRegister [value counter]
+(defrecord MyRegister [key value]
   Model
   (step [r op]
-    (let [c (inc counter)
-          v'   (:value op)]
+    (let [v'   (:value op)
+	  rk (:mkey op)]
         (condp = (:f op)
-          :writeTxn (MyRegister. (* 2 v') c)
+          :writeTxn (MyRegister. key (* 2 v'))
           :readTxn  (cond
                    ;; Read the expected value of the register,
                    ;; update the last known position
                    (or (nil? v')
 		       (= -20 v')
                        (= value v'))
-                   (MyRegister. value counter)
-                   true (inconsistent (str "can't read " v'
-                                                 " from register " value))))))
+                   (MyRegister. key value)
+                   true (inconsistent (str "read value: " v'
+                                                 " -- expected: " value))))))
   Object
   (toString [this] (pr-str value)))
 
