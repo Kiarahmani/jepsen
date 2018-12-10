@@ -2,8 +2,8 @@
 
 ;; CLIENT
 ;;====================================================================================
-(defn r   [_ _] {:type :invoke, :f :readTxn, :value nil, :mkey 0})
-(defn w   [_ _] {:type :invoke, :f :writeTxn, :value (rand-int 500), :mkey 0 })
+(defn r   [_ _] {:type :invoke, :f :readTxn, :value nil, :mkey (rand-int 6)})
+(defn w   [_ _] {:type :invoke, :f :writeTxn, :value (rand-int 500), :mkey (rand-int 6) })
 
 ;;====================================================================================
 (defrecord Client [conn]
@@ -11,7 +11,7 @@
   (open! [this test node]
 	(assoc this :conn (SeatsClient/getConnection (dns-resolve node))))    
   (setup! [this test]
-      (do (SeatsClient/writeTransaction conn 0 -10)
+      (do (dotimes [i 6] (SeatsClient/writeTransaction conn i -10))
 	  (Thread/sleep 1000)))
   (invoke! [this test op]
 	(case (:f op)
