@@ -19,7 +19,12 @@
 	(case (:f op)
         ;:readTxn (assoc op :type :ok, :value (SeatsClient/readTransaction conn (:mkey op)), :mkey (:mkey op) )
         :incTxn (assoc op :type :ok, :value (SeatsClient/incTransaction conn (:mkey op) (:value op)))
-	:decTxn (assoc op :type :ok, :value (SeatsClient/decTransaction conn (:mkey op) (:value op)))))
+	:decTxn (let [retStatus (SeatsClient/decTransaction conn (:mkey op) (:value op))]  
+                  (if (not (= retStatus 0))  
+                  (assoc op :type :ok, :value (str "Some Invariant is Broken in " op "  status:" retStatus))
+                  (assoc op :type :ok, :value 0))
+                  )))
+        
   (teardown! [this test]
 	(do (SeatsClient/closeConnection conn)))
   (close! [_ test]))

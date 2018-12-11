@@ -34,7 +34,8 @@
 	 (condp = (:f op)
           :decTxn (cond (= opReturnStatus 0)
           (MyRegister. opReturnStatus)
-           true (inconsistent (str "invariant violated: " opReturnStatus)))
+           true 
+           (inconsistent (str "invariant violated: " opReturnStatus)))
           :incTxn (MyRegister. opReturnStatus)))) 
   Object
   (toString [this] (pr-str status)))
