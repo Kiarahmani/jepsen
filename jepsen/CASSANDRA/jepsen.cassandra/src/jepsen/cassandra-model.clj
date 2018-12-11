@@ -27,26 +27,20 @@
 
 ;; DATA STRUCTURES
 ;;====================================================================================
-(defrecord MyRegister [kvMap]
+(defrecord MyRegister [status]
   Model
   (step [r op]
-  (let [opVal (:value op)
-	opKey  (:mkey op)
-	modelVal (nth kvMap (int opKey))]        
+  (let [opReturnStatus (:value op)]        
 	 (condp = (:f op)
-          :writeTxn(MyRegister. (assoc kvMap opKey (opVal)))
-          :readTxn (if (or (= modelVal opVal)
-			   (= -20 opVal)
-			   (nil? opVal))
-				(MyRegister. kvMap)
-				(MyRegister. kvMap)
-;				(inconsistent (str "read value: " opVal " ---> expected: " modelVal))
-))))
+          :decTxn (cond (= opReturnStatus 0)
+          (MyRegister. opReturnStatus)
+           true (inconsistent (str "invariant violated: " opReturnStatus)))
+          :incTxn (MyRegister. opReturnStatus)))) 
   Object
-  (toString [this] (pr-str kvMap)))
+  (toString [this] (pr-str status)))
 
 (defn my-register []
-  (MyRegister. (vec (repeat consts/_NUM_ASSERTIONS 1000))))
+  (MyRegister. [0]))
 
 ;; CHECKERS
 ;;====================================================================================
@@ -67,7 +61,10 @@
 	      (if (inconsistent? s')
 		{:valid? false
 		 :error (:msg s')}
-		(recur s' (rest history)))))))) ))
+		(recur s' (rest history)))))))
+
+) )) 
+;)
 
 
 

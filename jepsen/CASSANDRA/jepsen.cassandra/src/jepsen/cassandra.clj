@@ -63,12 +63,13 @@
           :os   debian/os
           :db   (db "3.11.3")
 	  :checker (checker/compose
-                    {:perf   (checker/perf)
+                    {;:perf   (checker/perf)
                      :linear (myChecker)
-		     :timeline  (timeline/html)})
+		     ;:timeline  (timeline/html)
+                     })
 	  :model      (my-register)
 	  :client (Client. nil)
-	  :generator (->> (gen/mix [r w])
+	  :generator (->> (gen/mix [i d])
                           (gen/stagger 1/100)
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
