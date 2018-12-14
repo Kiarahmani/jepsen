@@ -44,7 +44,6 @@
 (defn initJava!
 	"Installs Java on the given node"
 	[node version]
-	(if false ;;TODO: automate java detection	
 	(do 
 	(info node "Installing Java...")
 	(c/su
@@ -63,13 +62,13 @@
     		(c/exec :echo
             		"debconf shared/accepted-oracle-license-v1-1 select true"
             		| :debconf-set-selections)
-    		(debian/install [:oracle-java8-installer]))))))
+    		(debian/install [:oracle-java8-installer])))))
 
 ;;====================================================================================
 (defn install!
 	"Installs Cassandra on the given node"
 	[node version]
-	(info "starting installation...")
+	(info ">>>>>> starting cassandra installation...")
  (c/su
    (c/cd
     "/tmp"
@@ -78,9 +77,9 @@
                   (System/getenv "CASSANDRA_TARBALL_URL")
                   (str "http://apache.claz.org/cassandra/" version
                        "/apache-cassandra-" version "-bin.tar.gz"))]
-      (info node "installing Cassandra from" url)
+      (info node ">>>>>> installing Cassandra from" url)
       (if (cached-install? url)
-        (info "Used cached install on node" node)
+        (info ">>>>>> used cached install on node" node)
         (do (if tpath ;; else: if not found locally, download it
               (c/upload tpath "/tmp/cassandra.tar.gz")
               (c/exec :wget :-O "cassandra.tar.gz" url (lit ";")))

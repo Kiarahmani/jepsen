@@ -31,18 +31,29 @@
 
 
 ;;====================================================================================
+(def cli-opts
+  "Additional command line options."
+    [["-i" "--init-db" "wipes down any excisting data and creates a fresh cluster"]
+     ["-j" "--init-java" "installs java in freshly created jepsen nodes"]
+     ])
+
+
+
+;;====================================================================================
 (defn db
   "Cassandra for a particular version."
   [version]
   (reify db/DB
     (setup! [_ test node]
-      (info node "installing cassandra" version)
-      ;(wipe! node)
-      (doto node      
-	(install! version)
-	(initJava! version)
-	(configure! test)
-	(start! test)
+      (doto node
+        (info "KIRKIRKIRKIRKIR")      
+        (when (:init-db test)
+          (do (info node "<<initDB>> installing cassandra" version)
+              (wipe! node)
+	      (when (:init-java test)
+                (initJava! node version))
+	      (configure! node test)))
+        (start! test)
 ))
     (teardown! [_ test node]
       (info node "tearing down cassandra")
@@ -80,6 +91,7 @@
   "Handles command line arguments. Can either run a test, or a web server for
   browsing results."
   [& args]
-  (cli/run! (merge (cli/single-test-cmd {:test-fn cassandra-test})
+  (cli/run! (merge (cli/single-test-cmd {:test-fn cassandra-test
+                                         :opt-spec cli-opts})
                    (cli/serve-cmd))
             args))
