@@ -45,16 +45,15 @@
   [version]
   (reify db/DB
     (setup! [_ test node]
-      (doto node
-        (info "KIRKIRKIRKIRKIR")      
-        (when (:init-db test)
-          (do (info node "<<initDB>> installing cassandra" version)
+        (when (boolean (:init-db test))
+              (info node "<<initDB>> installing cassandra" version "--"  (boolean (:init-db test)))
               (wipe! node)
-	      (when (:init-java test)
+	      (when (boolean (:init-java test))
+                (info node "<<initJava>> installing java --" (boolean (:init-java test)))
                 (initJava! node version))
-	      (configure! node test)))
-        (start! test)
-))
+	      (configure! node test))
+        (start! node test)
+)
     (teardown! [_ test node]
       (info node "tearing down cassandra")
       ;(wipe! node)
