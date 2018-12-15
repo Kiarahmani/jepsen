@@ -1,3 +1,11 @@
+cd ~/Jepsen_Java_Tests/
+git pull
+cd -
+
+# files necessary to restore the initial db state
+docker cp ~/snapshots/testks jepsen-n1:/root/
+echo 'Initial snapshots moved to jepsen-n1 node'
+
 # copy the java application to the jepsen control node
 docker cp ~/Jepsen_Java_Tests/src/main/java/. jepsen-control:/root/java
 echo 'Java application copied'

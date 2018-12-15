@@ -11,8 +11,8 @@
   (open! [this test node]
 	(assoc this :conn (SeatsClient/getConnection (dns-resolve node))))    
   (setup! [this test]
-      (do (dotimes [i consts/_NUM_KEYS] (SeatsClient/initTransaction conn i))
-	  (Thread/sleep 1000)))
+    ; initial work required by clients goes here  
+    )
   (invoke! [this test op]
 	(case (:f op)
         :incTxn (assoc op :type :ok, :value (SeatsClient/incTransaction conn (:mkey op) (:value op)))

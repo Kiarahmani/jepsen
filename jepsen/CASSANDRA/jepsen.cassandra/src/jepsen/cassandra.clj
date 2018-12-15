@@ -54,7 +54,6 @@
                 (info node "<<initJava>> installing java --" (boolean (:init-java test)))
                 (initJava! node version))
 	      (configure! node test))
-        ; drop old keyspace and create a fresh one
         (start! node test)
         (when (boolean (:init-ks test))
           (prepareDB! node test))

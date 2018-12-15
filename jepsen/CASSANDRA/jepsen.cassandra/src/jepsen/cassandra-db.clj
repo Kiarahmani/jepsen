@@ -143,8 +143,11 @@
   [node test]
   (when (= (str node) "n1") 
     (info "creating keyspace and tables" (dns-resolve node))
-    (c/exec* (str "/root/cassandra/bin/cqlsh " (dns-resolve node) " -f ~/ddl.cql" )))
-)
+    (c/exec* (str "/root/cassandra/bin/cqlsh " (dns-resolve node) " -f ~/ddl.cql" ))
+    (info "Keyspace and tables intialized")
+    (c/exec* (str "/root/cassandra/bin/sstableloader  -d " (dns-resolve node) " /root/testks/k"))
+    (Thread/sleep 1000)
+    (info "Initial SSTables loaded")))
 
 
 
