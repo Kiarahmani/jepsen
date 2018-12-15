@@ -137,6 +137,18 @@
                       	(coordinator-batchlog-disabled?) "\"") 
      			:>> "~/cassandra/conf/cassandra-env.sh")
      (c/exec :sed :-i (lit "\"s/INFO/DEBUG/g\"") "~/cassandra/conf/logback.xml"):while))
+;;====================================================================================
+(defn prepareDB! 
+  "creating keyspace and tables"
+  [node test]
+  (when (= (str node) "n1") 
+    (info "creating keyspace and tables" (dns-resolve node))
+    (c/exec* (str "/root/cassandra/bin/cqlsh " (dns-resolve node) " -f ~/ddl.cql" )))
+)
+
+
+
+
 
 ;;====================================================================================
 (defn start!

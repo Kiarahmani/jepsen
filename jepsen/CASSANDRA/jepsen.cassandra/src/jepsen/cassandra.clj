@@ -19,6 +19,7 @@
 	    [knossos.model :as model]
 	    [knossos.op :as op]
             [jepsen.constants :as consts]
+            [clojure.java.shell :as shell]
 )
 (:import (clojure.lang ExceptionInfo)
            (java.net InetAddress)
@@ -35,8 +36,8 @@
   "Additional command line options."
     [["-i" "--init-db" "wipes down any excisting data and creates a fresh cluster"]
      ["-j" "--init-java" "installs java in freshly created jepsen nodes"]
+     ["-k" "--init-ks" "drops old keyspace and tables and creates and intializes fresh ones"]
      ])
-
 
 
 ;;====================================================================================
@@ -45,6 +46,7 @@
   [version]
   (reify db/DB
     (setup! [_ test node]
+        ; tear down the cluster and start again
         (when (boolean (:init-db test))
               (info node "<<initDB>> installing cassandra" version "--"  (boolean (:init-db test)))
               (wipe! node)
@@ -52,7 +54,10 @@
                 (info node "<<initJava>> installing java --" (boolean (:init-java test)))
                 (initJava! node version))
 	      (configure! node test))
+        ; drop old keyspace and create a fresh one
         (start! node test)
+        (when (boolean (:init-ks test))
+          (prepareDB! node test))
 )
     (teardown! [_ test node]
       (info node "tearing down cassandra")
