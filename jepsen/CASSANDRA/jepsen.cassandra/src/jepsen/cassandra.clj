@@ -56,7 +56,7 @@
 	      (configure! node test))
         (start! node test)
         (when (boolean (:init-ks test))
-          (prepareDB! node test))
+          (prepareDB! node test (line-seq (clojure.java.io/reader "/root/table.names"))))
 )
     (teardown! [_ test node]
       (info node "tearing down cassandra")

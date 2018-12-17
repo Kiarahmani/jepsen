@@ -6,6 +6,11 @@ cd -
 docker cp ~/snapshots/testks jepsen-n1:/root/
 echo 'Initial snapshots moved to jepsen-n1 node'
 
+# file containing the table names
+docker cp ~/Jepsen_Java_Tests/table.names jepsen-control:/root/
+echo 'table.names file moved to jepsen-control node'
+
+
 # copy the java application to the jepsen control node
 docker cp ~/Jepsen_Java_Tests/src/main/java/. jepsen-control:/root/java
 echo 'Java application copied'

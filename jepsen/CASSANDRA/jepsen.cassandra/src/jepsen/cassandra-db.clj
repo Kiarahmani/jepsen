@@ -138,16 +138,20 @@
      			:>> "~/cassandra/conf/cassandra-env.sh")
      (c/exec :sed :-i (lit "\"s/INFO/DEBUG/g\"") "~/cassandra/conf/logback.xml"):while))
 ;;====================================================================================
+
+
 (defn prepareDB! 
   "creating keyspace and tables"
-  [node test]
+  [node test tables]
   (when (= (str node) "n1") 
     (info "creating keyspace and tables" (dns-resolve node))
     (c/exec* (str "/root/cassandra/bin/cqlsh " (dns-resolve node) " -f ~/ddl.cql" ))
     (info "Keyspace and tables intialized")
-    (c/exec* (str "/root/cassandra/bin/sstableloader  -d " (dns-resolve node) " /root/testks/k"))
+    (doseq [t tables]
+      (do (info (str "Loading SSTables for: " t))
+          (c/exec* (str "/root/cassandra/bin/sstableloader  -d " (dns-resolve node) " /root/testks/" t))))
     (Thread/sleep 1000)
-    (info "Initial SSTables loaded")))
+    (info (str "Initial SSTables loaded "))))
 
 
 
