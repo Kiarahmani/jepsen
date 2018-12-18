@@ -27,25 +27,22 @@
 
 ;; DATA STRUCTURES
 ;;====================================================================================
-(defrecord MyRegister [status]
+(defrecord MyTxnStatus [status]
   Model
   (step [r op]
   (let [opReturnStatus (:value op)]        
-	 (condp = (:f op)
-          :decTxn (cond (= opReturnStatus 0)
-          (MyRegister. opReturnStatus)
-           true 
-           (inconsistent (str "invariant violated: " opReturnStatus)))
-          :incTxn (MyRegister. opReturnStatus)))) 
+          (if (= opReturnStatus 0)
+              (MyTxnStatus. opReturnStatus)
+              (inconsistent (str "An Invariant is Broken: " opReturnStatus)))))
   Object
   (toString [this] (pr-str status)))
 
-(defn my-register []
-  (MyRegister. [0]))
+(defn my-txn-status []
+  (MyTxnStatus. [0]))
 
 ;; CHECKERS
 ;;====================================================================================
-(defn myChecker
+(defn myStatusChecker
   "Ensures that no read returns the first value written by a txn"
   []
   (reify checker/Checker
@@ -62,10 +59,7 @@
 	      (if (inconsistent? s')
 		{:valid? false
 		 :error (:msg s')}
-		(recur s' (rest history)))))))
-
-) )) 
-;)
+		(recur s' (rest history)))))))))) 
 
 
 

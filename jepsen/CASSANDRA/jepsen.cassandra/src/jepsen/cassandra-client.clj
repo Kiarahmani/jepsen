@@ -2,28 +2,28 @@
 
 ;; CLIENT
 ;;====================================================================================
-(defn d   [_ _] {:type :invoke, :f :decTxn, :value (rand-int 50), :mkey (rand-int consts/_NUM_KEYS) })
-(defn i   [_ _] {:type :invoke, :f :incTxn, :value (rand-int 50), :mkey (rand-int consts/_NUM_KEYS) })
+(def callMap [{:f :openConn, :javaFunc (fn [ip] (SeatsClient/getConnection ip))}
+              {:f :closeConn, :javaFunc (fn [conn] (SeatsClient/closeConnection conn))}
+              {:f :incTxn, :javaFunc (fn [conn op] (SeatsClient/writeTransaction conn (:mkey op) (:value op))), :freq 50} , 
+              {:f :decTxn, :javaFunc (fn [conn op] (SeatsClient/readTransaction  conn (:mkey op) (:value op))), :freq 50}])
 
-;;====================================================================================
+
+
+
+
 (defrecord Client [conn]
   client/Client
   (open! [this test node]
-	(assoc this :conn (SeatsClient/getConnection (dns-resolve node))))    
+	(assoc this :conn ((:javaFunc (first (filter (fn [m] (= (:f m) :openConn)) callMap))) (dns-resolve node))))    
   (setup! [this test]
-    ; initial work required by clients goes here  
-    )
+  )
   (invoke! [this test op]
-	(case (:f op)
-        :incTxn (assoc op :type :ok, :value (SeatsClient/writeTransaction conn (:mkey op) (:value op)))
-	:decTxn (let [retStatus (SeatsClient/readTransaction conn (:mkey op) (:value op))]  
-                  (if (not (= retStatus 0))  
-                  (assoc op :type :ok, :value (str "Some Invariant is Broken in " op "  status:" retStatus))
-                  (assoc op :type :ok, :value 0))
-                  )))
+      (let [txn (:javaFunc (first (filter (fn [m] (= (:f m) (:f op))) callMap)))
+            retStatus (txn conn op)]  
+                  (assoc op :type :ok, :value retStatus)))
         
   (teardown! [this test]
-	(do (SeatsClient/closeConnection conn)))
+	(do ((:javaFunc (first (filter (fn [m] (= (:f m) :closeConn)) callMap))) conn)))
   (close! [_ test]))
 
 

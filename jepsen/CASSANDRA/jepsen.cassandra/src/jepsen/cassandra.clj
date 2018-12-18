@@ -67,6 +67,18 @@
          [logfile])))
 
 ;;====================================================================================
+
+(def my-gen
+  "Random txn generator according to the given distribution"
+  (reify gen/Generator
+    (op [generator test process]
+      (condp < (rand)
+        ; if rand is begger than the number at the LHS do the operation
+        0.5 {:type :invoke, :f :decTxn, :value (rand-int 50), :mkey (rand-int consts/_NUM_KEYS) }
+             {:type :invoke, :f :incTxn, :value (rand-int 50), :mkey (rand-int consts/_NUM_KEYS) }
+        ))))
+
+
 (defn cassandra-test
   "Given an options map from the command line runner (e.g. :nodes, :ssh,
   :concurrency, ...), constructs a test map."
@@ -77,13 +89,13 @@
           :os   debian/os
           :db   (db "3.11.3")
 	  :checker (checker/compose
-                    {;:perf   (checker/perf)
-                     :linear (myChecker)
+                    {:perf   (checker/perf)
+                     :linear (myStatusChecker)
 		     ;:timeline  (timeline/html)
                      })
-	  :model      (my-register)
+	  :model      (my-txn-status)
 	  :client (Client. nil)
-	  :generator (->> (gen/mix [i d])
+	  :generator (->> my-gen
                           (gen/stagger 1/100)
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
