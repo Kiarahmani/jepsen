@@ -10,7 +10,7 @@
   )
   (invoke! [this test op]
       (let [txn (:javaFunc (first (filter (fn [m] (= (:f m) (:f op))) operationMap)))
-            retStatus (txn conn op)]  
+            retStatus (txn conn (:args op))]  
                   (assoc op :type :ok, :returnStatus retStatus, :value retStatus)))
         
   (teardown! [this test]
