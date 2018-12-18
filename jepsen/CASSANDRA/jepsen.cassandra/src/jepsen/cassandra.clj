@@ -27,6 +27,7 @@
 )
 
 (load "cassandra-db")
+(load "cassandra-operations")
 (load "cassandra-model")
 (load "cassandra-client")
 
@@ -53,7 +54,8 @@
 	      (when (boolean (:init-java test))
                 (info node "<<initJava>> installing java --" (boolean (:init-java test)))
                 (initJava! node version))
-	      (configure! node test))
+	      (install! node version)
+              (configure! node test))
         (start! node test)
         (when (boolean (:init-ks test))
           (prepareDB! node test (line-seq (clojure.java.io/reader "/root/table.names"))))
@@ -67,16 +69,25 @@
          [logfile])))
 
 ;;====================================================================================
+(defn my-gen-helper
+  "given a random number, will return the appropriate operation from operationMap"
+  [randomIn]
+  (loop [randIn randomIn
+         sum 0
+         ops operationMap]
+    (if (> (+ sum (:freq (first ops))) randomIn)
+      (first ops)
+    (recur randIn (+ sum (:freq (first ops))) (rest ops))))
+ )
 
 (def my-gen
   "Random txn generator according to the given distribution"
   (reify gen/Generator
     (op [generator test process]
-      (condp < (rand)
-        ; if rand is begger than the number at the LHS do the operation
-        0.5 {:type :invoke, :f :decTxn, :value (rand-int 50), :mkey (rand-int consts/_NUM_KEYS) }
-             {:type :invoke, :f :incTxn, :value (rand-int 50), :mkey (rand-int consts/_NUM_KEYS) }
-        ))))
+      (let [nextOp (my-gen-helper (rand))
+            nextArgs (getNextArgs (:n nextOp))]
+      {:type :invoke, :f (:f nextOp), :args nextArgs, :returnStatus nil, :value nextArgs}
+      ))))
 
 
 (defn cassandra-test
@@ -96,7 +107,7 @@
 	  :model      (my-txn-status)
 	  :client (Client. nil)
 	  :generator (->> my-gen
-                          (gen/stagger 1/100)
+                          (gen/stagger 1/200)
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
 

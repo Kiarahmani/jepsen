@@ -30,7 +30,7 @@
 (defrecord MyTxnStatus [status]
   Model
   (step [r op]
-  (let [opReturnStatus (:value op)]        
+  (let [opReturnStatus (:returnStatus op)]        
           (if (= opReturnStatus 0)
               (MyTxnStatus. opReturnStatus)
               (inconsistent (str "An Invariant is Broken: " opReturnStatus)))))
