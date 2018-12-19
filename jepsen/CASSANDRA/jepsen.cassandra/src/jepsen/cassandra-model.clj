@@ -33,7 +33,7 @@
   (let [opReturnStatus (:returnStatus op)]        
           (if (= opReturnStatus 0)
               (MyTxnStatus. opReturnStatus)
-              (inconsistent (str "An Invariant is Broken: " opReturnStatus)))))
+              (inconsistent (str "An Invariant is Broken: " (errorMap opReturnStatus) " CODE: "  opReturnStatus)))))
   Object
   (toString [this] (pr-str status)))
 

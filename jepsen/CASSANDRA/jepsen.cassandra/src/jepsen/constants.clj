@@ -1,4 +1,14 @@
 (ns jepsen.constants)
 
 (def _NUM_KEYS 5)
-;; needs about 200 clients for 90 seconds to trigger the violation
+
+
+; constants
+(def _CUST_BY_STR_PROB 0.5)
+
+
+
+; test scale knobs (make sure appropriate snapshots will be used)
+(def _COSTUMER_COUNT 100)
+(def _FLIGHT_COUNT   5)
+(def _AIRLINE_COUNT   2)
