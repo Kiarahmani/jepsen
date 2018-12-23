@@ -149,7 +149,7 @@
     (info "Keyspace and tables intialized")
     (doseq [t tables]
       (do (info (str "Loading SSTables for: " t))
-          (c/exec* (str "/root/cassandra/bin/sstableloader  -d " (dns-resolve node) " /root/testks/" t))))
+          (c/exec* (str "/root/cassandra/bin/sstableloader  -d " (dns-resolve node) " /root/" consts/_KEYSPACE_NAME "/" t))))
     (Thread/sleep 1000)
     (info (str "Initial SSTables loaded "))))
 

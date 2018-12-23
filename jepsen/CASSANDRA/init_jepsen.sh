@@ -3,7 +3,7 @@ git pull
 cd -
 
 # files necessary to restore the initial db state
-docker cp ~/snapshots/testks jepsen-n1:/root/
+docker cp ~/snapshots/seats jepsen-n1:/root/
 echo 'Initial snapshots moved to jepsen-n1 node'
 
 # file containing the table names
