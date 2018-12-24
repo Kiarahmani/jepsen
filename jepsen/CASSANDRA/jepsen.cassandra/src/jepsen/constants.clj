@@ -4,7 +4,7 @@
 
 
 ; constants
-(def _CUST_BY_STR_PROB 0.5)
+(def _CUST_BY_STR_PROB 0.05)
 (def _KEYSPACE_NAME "seats")
 
 

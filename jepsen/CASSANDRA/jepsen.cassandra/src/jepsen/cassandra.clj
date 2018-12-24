@@ -23,7 +23,8 @@
 )
 (:import (clojure.lang ExceptionInfo)
            (java.net InetAddress)
-	   (SeatsClient))
+	   (SeatsClient)
+           (SeatsUtils))
 )
 
 (load "cassandra-db")
@@ -107,7 +108,7 @@
 	  :model      (my-txn-status)
 	  :client (Client. nil)
 	  :generator (->> my-gen
-                          (gen/stagger 1/200)
+                          (gen/stagger 1/100)
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
 
