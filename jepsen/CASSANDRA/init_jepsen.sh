@@ -4,7 +4,12 @@ cd -
 
 # files necessary to restore the initial db state
 docker cp ~/snapshots/seats jepsen-n1:/root/
-echo 'Initial snapshots moved to jepsen-n1 node'
+docker cp ~/snapshots/seats jepsen-control:/root/
+echo 'Initial snapshots moved to jepsen-n* node'
+
+
+
+
 
 # file containing the table names
 docker cp ~/Jepsen_Java_Tests/table.names jepsen-control:/root/
