@@ -111,6 +111,7 @@
                       "\"s/seeds: .*/seeds: 'n1,n2'/g\""
                       (str "\"s/listen_address: .*/listen_address: " (dns-resolve node)
                            "/g\"")
+                      (str "\"s/read_request_timeout: .*/read_request_timeout: 10000" "/g\"")
                       (str "\"s/rpc_address: .*/rpc_address: " (dns-resolve node) "/g\"")
                       (str "\"s/broadcast_rpc_address: .*/broadcast_rpc_address: "
                            (net/local-ip) "/g\"")
