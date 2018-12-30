@@ -69,7 +69,8 @@
             f    (gen_flight index)]
       [(:f_id f),(:c_id cust), (:c_id_str cust), (:ff_c_id_str ff), (:ff_al_id ff)])
     ;FindFlights
-    2  [1,1,1,1,1]
+    2 (let [beginDate (SeatsUtils/getNextRandomDate)] 
+      [(rand-int consts/_AIRPORT_COUNT),(rand-int consts/_AIRPORT_COUNT),beginDate,(SeatsUtils/getNextDateWithBegin beginDate),(rand-int 100)])
     ;FindOpenSeats
     3  [1]
     ;NewReservation
