@@ -51,8 +51,10 @@
 ; generate a new frequent flyer id
 (defn gen_ff
   []
+  (if (< (rand) consts/_FF_SHOULD_BE_UPDATED)
   {:ff_c_id_str (str (:c_id (gen_cust false (SeatsUtils/getRandomResIndex)))),
-   :ff_al_id (:al_id (gen_al))})
+   :ff_al_id (:al_id (gen_al))}
+  {:ff_c_id_str (str -1),:ff_al_id -1}))
 ;
 ;
 ;
