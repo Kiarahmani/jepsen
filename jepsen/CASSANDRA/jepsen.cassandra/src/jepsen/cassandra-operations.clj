@@ -70,9 +70,11 @@
       [(:f_id f),(:c_id cust), (:c_id_str cust), (:ff_c_id_str ff), (:ff_al_id ff)])
     ;FindFlights
     2 (let [beginDate (SeatsUtils/getNextRandomDate)] 
-      [(rand-int consts/_AIRPORT_COUNT),(rand-int consts/_AIRPORT_COUNT),beginDate,(SeatsUtils/getNextDateWithBegin beginDate),(rand-int 100)])
+      [(rand-int consts/_AIRPORT_COUNT),(rand-int consts/_AIRPORT_COUNT),beginDate,(SeatsUtils/getNextDateWithBegin beginDate),(rand-int consts/_MAXIMUM_ACCEPTABLE_DISTANCE)])
     ;FindOpenSeats
-    3  [1]
+    3  [(let [index (SeatsUtils/getRandomResIndex)
+              f (gen_flight index)]
+        (:f_id f))]
     ;NewReservation
     4  [1,1,1,1,1,(make-array Integer/TYPE 3)]
     ;UpdateCustomer
