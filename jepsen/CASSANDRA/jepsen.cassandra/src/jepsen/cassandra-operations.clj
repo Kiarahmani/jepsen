@@ -17,7 +17,7 @@
                           :javaFunc (fn [conn args] (SeatsClient/newReservation conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5))), 
                           :freq 20/100},
                    {:n 5, :f :UC-TXN, 
-                          :javaFunc (fn [conn args] (SeatsClient/updateCustomer conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5)(nth args 6))), 
+                          :javaFunc (fn [conn args] (SeatsClient/updateCustomer conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))), 
                           :freq 10/100},
                    {:n 6, :f :UR-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/updateReservation conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5))), 
@@ -87,7 +87,7 @@
     ;UpdateCustomer
     5  (let [index (SeatsUtils/getRandomResIndex)
              cust (gen_cust true index)]
-       [(:c_id cust), (:c_id_str cust),1,1,1])
+       [(:c_id cust), (:c_id_str cust),(- (rand-int 5) 2),(long (rand index)),(long (rand index))])
     ;UpdateReservation
     6  [1,1,1,1,1,1]
     (info "ERROR!! ---> UNKNOWN txnNo")
