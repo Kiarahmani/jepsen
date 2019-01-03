@@ -94,7 +94,7 @@
              c (gen_cust false index)
              f (gen_flight index)
              seatnum (+ (rand-int 147) 2)]
-        [r_id,(:f_id f),(:c_id c),seatnum,1,1])
+        [r_id,(:f_id f),(:c_id c),seatnum,1,(long (rand (SeatsUtils/getRandomResIndex)))])
     (info "ERROR!! ---> UNKNOWN txnNo")
     ))
 
