@@ -76,7 +76,14 @@
               f (gen_flight index)]
         (:f_id f))]
     ;NewReservation
-    4  [1,1,1,1,1,(make-array Integer/TYPE 3)]
+    4  (let [index   (SeatsUtils/getRandomResIndex)
+             custIDX (SeatsUtils/getRandomResIndex)
+             r_id    (SeatsUtils/getNewResId)
+             f       (gen_flight index)
+             c       (gen_cust false custIDX)
+             seatnum (+ (rand-int 146) 3)
+             attrs   (SeatsUtils/getNewAttrs)]
+        [r_id,(:c_id c),(:f_id f),seatnum,1,attrs])
     ;UpdateCustomer
     5  [1,1,"1",1,1,1,1]
     ;UpdateReservation
