@@ -85,7 +85,9 @@
              attrs   (SeatsUtils/getNewAttrs)]
         [r_id,(:c_id c),(:f_id f),seatnum,1,attrs])
     ;UpdateCustomer
-    5  [1,1,"1",1,1,1,1]
+    5  (let [index (SeatsUtils/getRandomResIndex)
+             cust (gen_cust true index)]
+       [(:c_id cust), (:c_id_str cust),1,1,1])
     ;UpdateReservation
     6  [1,1,1,1,1,1]
     (info "ERROR!! ---> UNKNOWN txnNo")
