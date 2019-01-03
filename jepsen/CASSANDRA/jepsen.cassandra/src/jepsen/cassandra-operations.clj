@@ -89,7 +89,12 @@
              cust (gen_cust true index)]
        [(:c_id cust), (:c_id_str cust),(- (rand-int 5) 2),(long (rand index)),(long (rand index))])
     ;UpdateReservation
-    6  [1,1,1,1,1,1]
+    6  (let [index (SeatsUtils/getRandomResIndex)
+             r_id    (SeatsUtils/getNewResId)
+             c (gen_cust false index)
+             f (gen_flight index)
+             seatnum (+ (rand-int 147) 2)]
+        [r_id,(:f_id f),(:c_id c),seatnum,1,1])
     (info "ERROR!! ---> UNKNOWN txnNo")
     ))
 
