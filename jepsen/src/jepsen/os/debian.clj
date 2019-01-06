@@ -158,9 +158,9 @@
                   :psmisc
                   :tar
                   :bzip2
-                  :libzip2
+                  :libzip4
                   :iputils-ping
-                  :iproute
+                  :iproute2
                   :rsyslog
                   :logrotate]))
 

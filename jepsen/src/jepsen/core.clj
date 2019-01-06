@@ -182,7 +182,8 @@
            (when (.isInterrupted (Thread/currentThread))
              (throw (InterruptedException. "Interrupted before running")))
 
-           (try (.countDown run-latch)
+           (try 
+                (.countDown run-latch)
                 (.await run-latch)
                 (info "Running" name)
                 (run-worker! worker)
@@ -312,7 +313,7 @@
                             (assoc :time (relative-time-nanos)))
                         (catch Throwable e
                           (when @abort? (throw e))
-
+        
                           ; Yes, we want Throwable here: assertion errors
                           ; are not Exceptions. D-:
                           (warn e "Process" (:process op) "crashed")
